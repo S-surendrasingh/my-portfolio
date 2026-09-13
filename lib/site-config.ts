@@ -1,7 +1,22 @@
 /** Set `NEXT_PUBLIC_SITE_URL` in production (e.g. https://yoursite.com). */
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://example.com");
+function resolveSiteUrl(): string {
+  const fromPublic = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (fromPublic) {
+    return fromPublic.replace(/\/$/, "");
+  }
+
+  const vercelHost =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.VERCEL_URL?.trim();
+  if (vercelHost) {
+    const host = vercelHost.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    return `https://${host}`;
+  }
+
+  return "https://example.com";
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 // TODO: replace with a real inbox once configured.
 export const CONTACT_EMAIL = "surendrar7000@gmail.com";
